@@ -4,9 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>東京シシ説 | 不動産に変わらない価値を</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 确保CDN资源适配GitHub Pages -->
+  <script src="https://cdn.tailwindcss.com" crossorigin="anonymous"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
   
   <style>
     /* 全局重置 - 极致干净 + 性能优化 */
@@ -14,14 +15,12 @@
       margin: 0; 
       padding: 0; 
       box-sizing: border-box; 
-      /* 防止动画卡顿：禁用文本选择 */
       -webkit-user-select: none;
       user-select: none;
     }
     html { 
       scroll-behavior: smooth; 
       overflow-x: hidden;
-      /* 移动端禁止缩放 */
       -webkit-text-size-adjust: 100%;
     }
     body { 
@@ -30,9 +29,7 @@
       font-family: 'Noto Sans JP', sans-serif;
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
-      /* GPU加速基础 */
       will-change: scroll-position;
-      /* 移动端触摸优化 */
       touch-action: pan-y;
       -webkit-overflow-scrolling: touch;
     }
@@ -40,19 +37,20 @@
     img { 
       display: block; 
       max-width: 100%; 
-      /* 图片加载优化 */
       object-fit: cover;
       will-change: opacity, transform;
+      /* 图片加载失败占位 */
+      background: #f5f5f5;
     }
 
-    /* 核心：苹果风格全屏滚动容器 - 性能优化 + 移动端适配 */
+    /* 核心：修复移动端100vh兼容问题（关键） */
     .scroll-container {
       width: 100vw;
+      /* 初始值，后续JS动态修正 */
       height: 100vh;
       overflow: hidden;
       position: relative;
       will-change: transform;
-      /* 移动端触摸事件优化 */
       touch-action: none;
     }
     .pages-wrapper {
@@ -60,12 +58,12 @@
       flex-direction: column;
       width: 100vw;
       transform: translateY(0);
-      /* 仅保留transform过渡（GPU加速），减少卡顿 */
       transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1); 
       will-change: transform;
     }
     .scroll-page {
       width: 100vw;
+      /* 初始值，后续JS动态修正 */
       height: 100vh;
       padding: 0 2rem;
       display: flex;
@@ -73,8 +71,6 @@
       justify-content: center;
       position: relative;
       overflow: hidden;
-      /* 移动端确保高度100% */
-      min-height: -webkit-fill-available;
     }
     .container-zeg {
       max-width: 900px;
@@ -86,7 +82,6 @@
 
     /* 自定义工具类 - 性能优化 */
     .text-thin { font-weight: 300; }
-    /* 仅保留transform/opacity过渡（GPU加速） */
     .transition-zeg { 
       transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
                   transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); 
@@ -98,14 +93,13 @@
     /* 社交角标容器 - 彻底修复显示不全 + 移动端适配 */
     .social-sidebar {
       position: fixed;
-      right: 50px; /* 大幅增加右侧间距，绝对不触边 */
+      right: 50px;
       top: 50%;
       transform: translateY(-50%);
       z-index: 9999;
       display: flex;
       flex-direction: column;
-      gap: 20px; /* 增大间距，避免提示框重叠 */
-      /* 确保容器不被截断 */
+      gap: 20px;
       overflow: visible;
     }
     .social-item {
@@ -119,18 +113,16 @@
       background: #fff;
       border-radius: 50%;
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      /* 性能优化 */
       will-change: transform;
     }
     .social-item i {
       font-size: 22px;
       color: #666;
-      transition: color 0.2s ease; /* 缩短过渡时长，更丝滑 */
+      transition: color 0.2s ease;
     }
-    /* 悬浮提示框 - 核心修复：绝对不显示不全 */
+    /* 悬浮提示框 - 核心修复 */
     .social-tooltip {
       position: absolute;
-      /* 关键修复：提示框在图标左侧，且远离边缘 */
       right: calc(100% + 20px); 
       top: 50%;
       transform: translateY(-50%) translateX(10px);
@@ -140,19 +132,16 @@
       align-items: center;
       gap: 12px;
       background: #FFFFFF;
-      padding: 12px 24px; /* 充足内边距，不挤内容 */
+      padding: 12px 24px;
       border: 1px solid #eee;
       border-radius: 8px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-      /* 仅保留GPU加速属性，减少卡顿 */
       transition: opacity 0.2s ease, transform 0.2s ease;
       z-index: 10000;
-      white-space: nowrap; /* 强制单行 */
-      width: auto; /* 自适应宽度，不限制最大/最小 */
-      /* 关键：绝对不截断内容 */
+      white-space: nowrap;
+      width: auto;
       overflow: visible;
       box-sizing: content-box;
-      /* 性能优化 */
       will-change: opacity, transform;
     }
     /* 头像 - 彻底修复显示 */
@@ -160,10 +149,9 @@
       width: 42px;
       height: 42px;
       border-radius: 50%;
-      object-fit: cover; /* 裁剪适配，不拉伸 */
+      object-fit: cover;
       border: 1px solid #f5f5f5;
-      flex-shrink: 0; /* 绝对不压缩 */
-      /* 性能优化 */
+      flex-shrink: 0;
       will-change: opacity;
     }
     .tooltip-name {
@@ -172,11 +160,10 @@
       font-weight: 300;
       line-height: 1.2;
       text-align: left;
-      /* 确保文字不截断 */
       overflow: visible;
     }
     .social-item:hover .social-tooltip,
-    .social-item:active .social-tooltip { /* 移动端触摸触发 */
+    .social-item:active .social-tooltip {
       opacity: 1;
       visibility: visible;
       transform: translateY(-50%) translateX(0);
@@ -195,9 +182,8 @@
       z-index: 50;
       padding: 8px 0;
       border-bottom: 1px solid #EEEEEE;
-      transition: background 0.2s ease; /* 缩短过渡，减少卡顿 */
+      transition: background 0.2s ease;
       will-change: background;
-      /* 移动端适配 */
       min-height: 50px;
     }
     .header-inner {
@@ -234,7 +220,6 @@
       border: none;
       cursor: pointer;
       transition: color 0.2s ease;
-      /* 移动端触摸优化 */
       -webkit-tap-highlight-color: transparent;
     }
     .page-btn.active {
@@ -253,7 +238,6 @@
       border: none;
       cursor: pointer;
       transition: color 0.2s ease;
-      /* 移动端触摸优化 */
       -webkit-tap-highlight-color: transparent;
     }
     #langBtn:hover,
@@ -262,21 +246,17 @@
     }
 
     /* 苹果风格元素动画 - 彻底修复卡顿 */
-    /* 初始状态：隐藏+偏移 */
     .animate-element {
       opacity: 0;
       transform: translateY(30px);
-      /* 仅保留GPU加速属性，减少重排 */
       transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), 
                   transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-      /* 关键：提前告知浏览器动画，GPU加速 */
       will-change: opacity, transform;
     }
     .animate-element.active {
       opacity: 1;
       transform: translateY(0);
     }
-    /* 图片动画（更慢更缓 + 性能优化） */
     .animate-img {
       opacity: 0;
       transform: scale(0.98);
@@ -288,7 +268,6 @@
       opacity: 1;
       transform: scale(1);
     }
-    /* 按钮动画 */
     .animate-btn {
       opacity: 0;
       transform: translateY(20px);
@@ -301,11 +280,10 @@
       transform: translateY(0);
     }
 
-    /* 响应式调整 - 适配小屏，避免提示框出界 */
+    /* 响应式调整 - 适配小屏 */
     @media (max-width: 768px) {
       .scroll-page {
         padding: 0 1rem;
-        /* 移动端确保垂直居中 */
         justify-content: flex-start;
         padding-top: 80px;
       }
@@ -316,7 +294,6 @@
         font-size: 2.5rem !important;
         line-height: 1.4 !important;
       }
-      /* 小屏优化提示框位置 */
       .social-sidebar {
         right: 20px;
         gap: 15px;
@@ -339,12 +316,10 @@
       .tooltip-name {
         font-size: 14px;
       }
-      /* 小屏地址换行优化 */
       .contact-info {
         font-size: 0.9rem !important;
         line-height: 1.6 !important;
       }
-      /* 移动端导航优化 */
       .header-inner {
         padding: 0 1rem;
       }
@@ -379,7 +354,7 @@
     </div>
   </header>
 
-  <!-- 社交角标 - 修复后绝对显示完整 -->
+  <!-- 社交角标 -->
   <div class="social-sidebar">
     <div class="social-item">
       <i class="fa-brands fa-tiktok"></i>
@@ -388,6 +363,7 @@
           src="https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/b16bebed57684c5d8da0299e8951e99b.jpg~tplv-a9rns2rl98-24:720:720.image?lk3s=8e244e95&rcl=20260302181820324CBFB3089B879DA651&rrcfp=8a172a1a&x-expires=1773051500&x-signature=ezK2l0CmC57E7GP9bNcAmOL0Sxg%3D" 
           alt="东京茜茜说" 
           class="avatar-img"
+          onerror="this.src='https://picsum.photos/42/42?grayscale'"
         >
         <span class="tooltip-name">东京茜茜说</span>
       </div>
@@ -399,6 +375,7 @@
           src="https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/b16bebed57684c5d8da0299e8951e99b.jpg~tplv-a9rns2rl98-24:720:720.image?lk3s=8e244e95&rcl=20260302181820324CBFB3089B879DA651&rrcfp=8a172a1a&x-expires=1773051500&x-signature=ezK2l0CmC57E7GP9bNcAmOL0Sxg%3D" 
           alt="东京茜茜说" 
           class="avatar-img"
+          onerror="this.src='https://picsum.photos/42/42?grayscale'"
         >
         <span class="tooltip-name">东京茜茜说</span>
       </div>
@@ -410,6 +387,7 @@
           src="https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/b16bebed57684c5d8da0299e8951e99b.jpg~tplv-a9rns2rl98-24:720:720.image?lk3s=8e244e95&rcl=20260302181820324CBFB3089B879DA651&rrcfp=8a172a1a&x-expires=1773051500&x-signature=ezK2l0CmC57E7GP9bNcAmOL0Sxg%3D" 
           alt="东京茜茜说" 
           class="avatar-img"
+          onerror="this.src='https://picsum.photos/42/42?grayscale'"
         >
         <span class="tooltip-name">东京茜茜说</span>
       </div>
@@ -423,7 +401,7 @@
       <div class="scroll-page" data-page="0">
         <div class="container-zeg">
           <div class="w-full h-[45vh] mb-20 overflow-hidden animate-img">
-            <img src="https://picsum.photos/id/1076/1200/600" alt="東京高級マンション">
+            <img src="https://picsum.photos/id/1076/1200/600" alt="東京高級マンション" onerror="this.src='https://picsum.photos/1200/600?grayscale'">
           </div>
           <p class="text-[#888888] text-xl text-thin mb-8 animate-element" id="catch1">不動産に変わらない価値を</p>
           <h1 class="text-4xl md:text-5xl text-thin mb-16 leading-tight animate-element" id="catch2">
@@ -488,14 +466,14 @@
               <h2 class="text-2xl text-thin animate-element" id="works_title">WORKS</h2>
             </div>
             <div class="md:w-3/4 grid grid-cols-2 gap-4">
-              <img src="https://picsum.photos/id/1076/600/400" alt="物件事例" class="w-full animate-img" style="transition-delay: 0.1s;">
-              <img src="https://picsum.photos/id/1048/600/400" alt="物件事例" class="w-full animate-img" style="transition-delay: 0.2s;">
+              <img src="https://picsum.photos/id/1076/600/400" alt="物件事例" class="w-full animate-img" style="transition-delay: 0.1s;" onerror="this.src='https://picsum.photos/600/400?grayscale'">
+              <img src="https://picsum.photos/id/1048/600/400" alt="物件事例" class="w-full animate-img" style="transition-delay: 0.2s;" onerror="this.src='https://picsum.photos/600/400?grayscale'">
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 第5页：CONTACT（补充完整地址、电话、传真） -->
+      <!-- 第5页：CONTACT -->
       <div class="scroll-page bg-[#EEEEEE]/20" data-page="4">
         <div class="container-zeg">
           <div class="flex flex-col md:flex-row gap-16">
@@ -507,7 +485,6 @@
               <p class="text-[#888888] text-lg text-thin leading-relaxed mb-6 animate-element" id="contact_text" style="transition-delay: 0.1s;">
                 不動産投資のことなら何でもご相談ください。オンライン無料相談を受け付けています。
               </p>
-              <!-- 完整联系方式 - 动画显示 -->
               <div class="text-[#888888] text-lg text-thin leading-relaxed mb-12">
                 <p class="animate-element contact-info" id="company_address" style="transition-delay: 0.2s; margin-bottom: 8px;">
                   住所：101-0054 東京都千代田区神田錦町3-7-2 東京堂錦町ビル8階
@@ -528,9 +505,27 @@
   </div>
 
   <script>
-    // 等待DOM完全加载后执行（修复开屏动画卡顿核心）
+    // 等待DOM完全加载后执行
     document.addEventListener('DOMContentLoaded', () => {
-      // 1. 中日双语数据（补充完整地址、电话、传真的双语）
+      // ========== 修复1：动态计算视口高度（解决移动端100vh兼容问题） ==========
+      function setViewportHeight() {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+        
+        // 更新滚动容器和页面高度
+        const scrollContainer = document.getElementById('scrollContainer');
+        const scrollPages = document.querySelectorAll('.scroll-page');
+        scrollContainer.style.height = `${window.innerHeight}px`;
+        scrollPages.forEach(page => {
+          page.style.height = `${window.innerHeight}px`;
+        });
+      }
+      
+      // 初始化+监听窗口大小变化
+      setViewportHeight();
+      window.addEventListener('resize', setViewportHeight);
+
+      // ========== 双语数据 ==========
       const lang = {
         ja: {
           logo: "東京シシ説",
@@ -576,7 +571,7 @@
         }
       };
 
-      // 2. 语言切换逻辑
+      // ========== 语言切换逻辑 ==========
       let currentLang = 'ja';
       const langBtn = document.getElementById('langBtn');
       const tooltipNames = document.querySelectorAll('.tooltip-name');
@@ -601,7 +596,7 @@
         });
       });
 
-      // 3. 苹果风格滚动动画核心逻辑 - 性能优化版 + 移动端触摸支持
+      // ========== 滚动动画核心逻辑 ==========
       const pagesWrapper = document.getElementById('pagesWrapper');
       const pages = document.querySelectorAll('.scroll-page');
       const pageBtns = document.querySelectorAll('.page-btn');
@@ -613,26 +608,33 @@
       // 移动端触摸变量
       let touchStartY = 0;
       let touchEndY = 0;
-      const SWIPE_THRESHOLD = 50; // 滑动阈值（px），避免误触
+      const SWIPE_THRESHOLD = 50;
 
-      // 激活当前页面的元素动画（修复反复切换无动画的核心修改）
+      // ========== 修复2：稳定的动画触发逻辑 ==========
       function activatePageAnimations(pageIndex) {
         const currentPageEl = pages[pageIndex];
         const animateElements = currentPageEl.querySelectorAll('.animate-element, .animate-img, .animate-btn');
         
-        // 步骤1：移除所有active类，重置动画状态
+        // 重置动画状态（强制重绘）
         animateElements.forEach(el => {
           el.classList.remove('active');
-          // 强制触发重绘（关键：避免浏览器优化导致样式不更新）
-          void el.offsetWidth;
+          el.style.opacity = '0';
+          if (el.classList.contains('animate-element')) el.style.transform = 'translateY(30px)';
+          if (el.classList.contains('animate-img')) el.style.transform = 'scale(0.98)';
+          if (el.classList.contains('animate-btn')) el.style.transform = 'translateY(20px)';
+          void el.offsetWidth; // 强制重绘
         });
         
-        // 步骤2：延迟添加active类，重新触发动画
+        // 分批次触发动画（更流畅）
         setTimeout(() => {
-          animateElements.forEach(el => {
-            el.classList.add('active');
+          animateElements.forEach((el, idx) => {
+            setTimeout(() => {
+              el.classList.add('active');
+              el.style.opacity = '';
+              el.style.transform = '';
+            }, (el.style.transitionDelay || 0) || idx * 50);
           });
-        }, 50); 
+        }, 100); 
       }
 
       // 更新导航按钮状态
@@ -642,70 +644,59 @@
         });
       }
 
-      // 切换页面核心函数 - 性能优化
+      // 切换页面核心函数
       function goToPage(pageIndex) {
         if (pageIndex < 0 || pageIndex >= totalPages || isAnimating) return;
         
         isAnimating = true;
         currentPage = pageIndex;
         
-        // 仅修改transform（GPU加速，无重排）
-        pagesWrapper.style.transform = `translateY(-${currentPage * 100}vh)`;
+        // 仅修改transform（GPU加速）
+        pagesWrapper.style.transform = `translateY(-${currentPage * 100}%)`;
         
         // 更新导航和激活动画
         updateNavButtons();
         activatePageAnimations(currentPage);
         
-        // 缩短解锁时间，匹配CSS过渡时长
+        // 匹配CSS过渡时长解锁
         setTimeout(() => {
           isAnimating = false;
         }, 800); 
       }
 
-      // PC端：监听鼠标滚轮 - 防抖优化
+      // ========== 修复3：滚动事件优化（无浏览器警告） ==========
       let wheelTimeout;
       document.addEventListener('wheel', (e) => {
-        e.preventDefault();
         if (isAnimating) return;
+        e.preventDefault(); // 阻止默认滚动
         
-        // 防抖，避免快速滚动多次触发
         clearTimeout(wheelTimeout);
         wheelTimeout = setTimeout(() => {
           goToPage(e.deltaY > 0 ? currentPage + 1 : currentPage - 1);
         }, 50);
       }, { passive: false });
 
-      // 移动端：触摸开始事件
+      // 移动端触摸事件
       scrollContainer.addEventListener('touchstart', (e) => {
         if (isAnimating) return;
-        // 记录触摸起始位置
         touchStartY = e.touches[0].clientY;
       }, { passive: true });
 
-      // 移动端：触摸移动事件
       scrollContainer.addEventListener('touchmove', (e) => {
         if (isAnimating) return;
-        // 实时更新触摸结束位置
         touchEndY = e.touches[0].clientY;
       }, { passive: true });
 
-      // 移动端：触摸结束事件（核心）
       scrollContainer.addEventListener('touchend', () => {
         if (isAnimating) return;
         
-        // 计算滑动距离
         const swipeDistance = touchEndY - touchStartY;
-        
-        // 判断滑动方向并触发页面切换
         if (swipeDistance < -SWIPE_THRESHOLD) {
-          // 向上滑动（手指从下往上），切换到下一页
           goToPage(currentPage + 1);
         } else if (swipeDistance > SWIPE_THRESHOLD) {
-          // 向下滑动（手指从上往下），切换到上一页
           goToPage(currentPage - 1);
         }
         
-        // 重置触摸位置
         touchStartY = 0;
         touchEndY = 0;
       }, { passive: true });
@@ -722,7 +713,7 @@
         else if (e.key === 'ArrowDown') goToPage(currentPage + 1);
       });
 
-      // 初始化：激活第一页动画（DOM加载完成后）
+      // 初始化
       activatePageAnimations(0);
       updateNavButtons();
     });
