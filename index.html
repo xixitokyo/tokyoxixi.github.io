@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>東京シシ説 | 不動産に変わらない価値を</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400&display=swap" rel="stylesheet">
@@ -21,6 +21,8 @@
     html { 
       scroll-behavior: smooth; 
       overflow-x: hidden;
+      /* 移动端禁止缩放 */
+      -webkit-text-size-adjust: 100%;
     }
     body { 
       background: #FFFFFF; 
@@ -30,6 +32,9 @@
       overflow-x: hidden;
       /* GPU加速基础 */
       will-change: scroll-position;
+      /* 移动端触摸优化 */
+      touch-action: pan-y;
+      -webkit-overflow-scrolling: touch;
     }
     a { text-decoration: none; color: inherit; }
     img { 
@@ -40,13 +45,15 @@
       will-change: opacity, transform;
     }
 
-    /* 核心：苹果风格全屏滚动容器 - 性能优化 */
+    /* 核心：苹果风格全屏滚动容器 - 性能优化 + 移动端适配 */
     .scroll-container {
       width: 100vw;
       height: 100vh;
       overflow: hidden;
       position: relative;
       will-change: transform;
+      /* 移动端触摸事件优化 */
+      touch-action: none;
     }
     .pages-wrapper {
       display: flex;
@@ -66,6 +73,8 @@
       justify-content: center;
       position: relative;
       overflow: hidden;
+      /* 移动端确保高度100% */
+      min-height: -webkit-fill-available;
     }
     .container-zeg {
       max-width: 900px;
@@ -86,7 +95,7 @@
     .gap-16 { gap: 4rem; }
     .leading-relaxed { line-height: 1.8; }
 
-    /* 社交角标容器 - 彻底修复显示不全 */
+    /* 社交角标容器 - 彻底修复显示不全 + 移动端适配 */
     .social-sidebar {
       position: fixed;
       right: 50px; /* 大幅增加右侧间距，绝对不触边 */
@@ -166,16 +175,18 @@
       /* 确保文字不截断 */
       overflow: visible;
     }
-    .social-item:hover .social-tooltip {
+    .social-item:hover .social-tooltip,
+    .social-item:active .social-tooltip { /* 移动端触摸触发 */
       opacity: 1;
       visibility: visible;
       transform: translateY(-50%) translateX(0);
     }
-    .social-item:hover i {
+    .social-item:hover i,
+    .social-item:active i {
       color: #111;
     }
 
-    /* 固定导航 - 极简 + 性能 */
+    /* 固定导航 - 极简 + 性能 + 移动端适配 */
     header {
       position: fixed;
       width: 100%;
@@ -186,6 +197,8 @@
       border-bottom: 1px solid #EEEEEE;
       transition: background 0.2s ease; /* 缩短过渡，减少卡顿 */
       will-change: background;
+      /* 移动端适配 */
+      min-height: 50px;
     }
     .header-inner {
       max-width: 900px;
@@ -221,12 +234,15 @@
       border: none;
       cursor: pointer;
       transition: color 0.2s ease;
+      /* 移动端触摸优化 */
+      -webkit-tap-highlight-color: transparent;
     }
     .page-btn.active {
       color: #111;
       font-weight: 400;
     }
-    .page-btn:hover {
+    .page-btn:hover,
+    .page-btn:active {
       color: #111;
     }
     #langBtn {
@@ -237,8 +253,11 @@
       border: none;
       cursor: pointer;
       transition: color 0.2s ease;
+      /* 移动端触摸优化 */
+      -webkit-tap-highlight-color: transparent;
     }
-    #langBtn:hover {
+    #langBtn:hover,
+    #langBtn:active {
       color: #111;
     }
 
@@ -286,26 +305,58 @@
     @media (max-width: 768px) {
       .scroll-page {
         padding: 0 1rem;
+        /* 移动端确保垂直居中 */
+        justify-content: flex-start;
+        padding-top: 80px;
       }
       .container-zeg {
         padding: 0 1rem;
       }
       h1 {
         font-size: 2.5rem !important;
+        line-height: 1.4 !important;
       }
       /* 小屏优化提示框位置 */
       .social-sidebar {
         right: 20px;
+        gap: 15px;
+      }
+      .social-item {
+        width: 40px;
+        height: 40px;
+      }
+      .social-item i {
+        font-size: 18px;
       }
       .social-tooltip {
         right: calc(100% + 15px);
         padding: 10px 18px;
+      }
+      .avatar-img {
+        width: 36px;
+        height: 36px;
+      }
+      .tooltip-name {
+        font-size: 14px;
       }
       /* 小屏地址换行优化 */
       .contact-info {
         font-size: 0.9rem !important;
         line-height: 1.6 !important;
       }
+      /* 移动端导航优化 */
+      .header-inner {
+        padding: 0 1rem;
+      }
+      .nav-wrapper {
+        gap: 1rem;
+      }
+    }
+
+    /* 移动端禁止高亮 */
+    * {
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+      tap-highlight-color: rgba(0, 0, 0, 0);
     }
   </style>
 </head>
@@ -366,7 +417,7 @@
   </div>
 
   <!-- 核心滚动容器 -->
-  <div class="scroll-container">
+  <div class="scroll-container" id="scrollContainer">
     <div class="pages-wrapper" id="pagesWrapper">
       <!-- 第1页：HOME -->
       <div class="scroll-page" data-page="0">
@@ -550,13 +601,19 @@
         });
       });
 
-      // 3. 苹果风格滚动动画核心逻辑 - 性能优化版
+      // 3. 苹果风格滚动动画核心逻辑 - 性能优化版 + 移动端触摸支持
       const pagesWrapper = document.getElementById('pagesWrapper');
       const pages = document.querySelectorAll('.scroll-page');
       const pageBtns = document.querySelectorAll('.page-btn');
+      const scrollContainer = document.getElementById('scrollContainer');
       let currentPage = 0;
       const totalPages = pages.length;
       let isAnimating = false;
+
+      // 移动端触摸变量
+      let touchStartY = 0;
+      let touchEndY = 0;
+      const SWIPE_THRESHOLD = 50; // 滑动阈值（px），避免误触
 
       // 激活当前页面的元素动画（修复反复切换无动画的核心修改）
       function activatePageAnimations(pageIndex) {
@@ -605,7 +662,7 @@
         }, 800); 
       }
 
-      // 监听鼠标滚轮 - 防抖优化
+      // PC端：监听鼠标滚轮 - 防抖优化
       let wheelTimeout;
       document.addEventListener('wheel', (e) => {
         e.preventDefault();
@@ -617,6 +674,41 @@
           goToPage(e.deltaY > 0 ? currentPage + 1 : currentPage - 1);
         }, 50);
       }, { passive: false });
+
+      // 移动端：触摸开始事件
+      scrollContainer.addEventListener('touchstart', (e) => {
+        if (isAnimating) return;
+        // 记录触摸起始位置
+        touchStartY = e.touches[0].clientY;
+      }, { passive: true });
+
+      // 移动端：触摸移动事件
+      scrollContainer.addEventListener('touchmove', (e) => {
+        if (isAnimating) return;
+        // 实时更新触摸结束位置
+        touchEndY = e.touches[0].clientY;
+      }, { passive: true });
+
+      // 移动端：触摸结束事件（核心）
+      scrollContainer.addEventListener('touchend', () => {
+        if (isAnimating) return;
+        
+        // 计算滑动距离
+        const swipeDistance = touchEndY - touchStartY;
+        
+        // 判断滑动方向并触发页面切换
+        if (swipeDistance < -SWIPE_THRESHOLD) {
+          // 向上滑动（手指从下往上），切换到下一页
+          goToPage(currentPage + 1);
+        } else if (swipeDistance > SWIPE_THRESHOLD) {
+          // 向下滑动（手指从上往下），切换到上一页
+          goToPage(currentPage - 1);
+        }
+        
+        // 重置触摸位置
+        touchStartY = 0;
+        touchEndY = 0;
+      }, { passive: true });
 
       // 导航按钮点击
       pageBtns.forEach((btn, idx) => {
