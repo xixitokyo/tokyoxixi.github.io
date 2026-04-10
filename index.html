@@ -1,722 +1,244 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>東京シシ説 | 不動産に変わらない価値を</title>
-  <!-- 确保CDN资源适配GitHub Pages -->
-  <script src="https://cdn.tailwindcss.com" crossorigin="anonymous"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
-  
-  <style>
-    /* 全局重置 - 极致干净 + 性能优化 */
-    * { 
-      margin: 0; 
-      padding: 0; 
-      box-sizing: border-box; 
-      -webkit-user-select: none;
-      user-select: none;
-    }
-    html { 
-      scroll-behavior: smooth; 
-      overflow-x: hidden;
-      -webkit-text-size-adjust: 100%;
-    }
-    body { 
-      background: #FFFFFF; 
-      color: #111111; 
-      font-family: 'Noto Sans JP', sans-serif;
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-      will-change: scroll-position;
-      touch-action: pan-y;
-      -webkit-overflow-scrolling: touch;
-    }
-    a { text-decoration: none; color: inherit; }
-    img { 
-      display: block; 
-      max-width: 100%; 
-      object-fit: cover;
-      will-change: opacity, transform;
-      /* 图片加载失败占位 */
-      background: #f5f5f5;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>株式会社茜</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+html{scroll-behavior:smooth}
+body{background:#fff;color:#1d1d1f;padding-top:66px;}
 
-    /* 核心：修复移动端100vh兼容问题（关键） */
-    .scroll-container {
-      width: 100vw;
-      /* 初始值，后续JS动态修正 */
-      height: 100vh;
-      overflow: hidden;
-      position: relative;
-      will-change: transform;
-      touch-action: none;
-    }
-    .pages-wrapper {
-      display: flex;
-      flex-direction: column;
-      width: 100vw;
-      transform: translateY(0);
-      transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1); 
-      will-change: transform;
-    }
-    .scroll-page {
-      width: 100vw;
-      /* 初始值，后续JS动态修正 */
-      height: 100vh;
-      padding: 0 2rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .container-zeg {
-      max-width: 900px;
-      margin: 0 auto;
-      width: 100%;
-      position: relative;
-      z-index: 2;
-    }
+/* ========== 主导航 —— 只留这一个！固定在最顶端！永不BUG！ ========== */
+.nav{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:66px;
+  background:rgba(255,255,255,0.95);
+  backdrop-filter:blur(20px);
+  z-index:9998;
+  border-bottom:1px solid #eee;
+}
+.nav-inner{
+  max-width:1000px;
+  margin:0 auto;
+  height:100%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 24px;
+}
+.logo{font-size:20px;font-weight:700}
+.lang{
+  font-size:15px;
+  padding:8px 12px;
+  border:none;
+  background:transparent;
+  border-radius:12px;
+  cursor:pointer;
+  transition:0.25s;
+}
+.lang.active{background:#e6f0ff;color:#0071e3}
+.lang:hover{background:#f0f7ff}
 
-    /* 自定义工具类 - 性能优化 */
-    .text-thin { font-weight: 300; }
-    .transition-zeg { 
-      transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
-                  transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); 
-      will-change: opacity, transform;
-    }
-    .gap-16 { gap: 4rem; }
-    .leading-relaxed { line-height: 1.8; }
+/* ========== 首页 纯CSS动画 无图 ========== */
+.hero{
+  height:70vh;
+  min-height:480px;
+  background:linear-gradient(135deg, #0d47a1, #1976d2);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  color:#fff;
+  padding:0 24px;
+  position:relative;
+  overflow:hidden;
+}
 
-    /* 社交角标容器 - 彻底修复显示不全 + 移动端适配 */
-    .social-sidebar {
-      position: fixed;
-      right: 50px;
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      overflow: visible;
-    }
-    .social-item {
-      position: relative;
-      width: 48px;
-      height: 48px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      background: #fff;
-      border-radius: 50%;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      will-change: transform;
-    }
-    .social-item i {
-      font-size: 22px;
-      color: #666;
-      transition: color 0.2s ease;
-    }
-    /* 悬浮提示框 - 核心修复 */
-    .social-tooltip {
-      position: absolute;
-      right: calc(100% + 20px); 
-      top: 50%;
-      transform: translateY(-50%) translateX(10px);
-      opacity: 0;
-      visibility: hidden;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background: #FFFFFF;
-      padding: 12px 24px;
-      border: 1px solid #eee;
-      border-radius: 8px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-      transition: opacity 0.2s ease, transform 0.2s ease;
-      z-index: 10000;
-      white-space: nowrap;
-      width: auto;
-      overflow: visible;
-      box-sizing: content-box;
-      will-change: opacity, transform;
-    }
-    /* 头像 - 彻底修复显示 */
-    .avatar-img {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 1px solid #f5f5f5;
-      flex-shrink: 0;
-      will-change: opacity;
-    }
-    .tooltip-name {
-      font-size: 15px;
-      color: #333;
-      font-weight: 300;
-      line-height: 1.2;
-      text-align: left;
-      overflow: visible;
-    }
-    .social-item:hover .social-tooltip,
-    .social-item:active .social-tooltip {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(-50%) translateX(0);
-    }
-    .social-item:hover i,
-    .social-item:active i {
-      color: #111;
-    }
+/* 浮动气泡动画 */
+.hero::before,
+.hero::after,
+.hero .dot1,
+.hero .dot2{
+  content:'';
+  position:absolute;
+  border-radius:50%;
+  background:rgba(255,255,255,0.08);
+  animation:float 10s infinite ease-in-out;
+}
+.hero::before{width:280px;height:280px;top:-80px;left:-100px;animation-duration:9s}
+.hero::after{width:360px;height:360px;bottom:-140px;right:-160px;animation-duration:12s;animation-delay:1s}
+.hero .dot1{width:120px;height:120px;top:60px;right:100px;animation-duration:7s;animation-delay:0.5s}
+.hero .dot2{width:80px;height:80px;bottom:100px;left:120px;animation-duration:8s;animation-delay:1.5s}
 
-    /* 固定导航 - 极简 + 性能 + 移动端适配 */
-    header {
-      position: fixed;
-      width: 100%;
-      top: 0;
-      background: white/98;
-      z-index: 50;
-      padding: 8px 0;
-      border-bottom: 1px solid #EEEEEE;
-      transition: background 0.2s ease;
-      will-change: background;
-      min-height: 50px;
-    }
-    .header-inner {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 0 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    #logo {
-      font-size: 1.1rem;
-      font-weight: 300;
-    }
-    .nav-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 2rem;
-    }
-    nav {
-      display: none;
-      gap: 2rem;
-    }
-    @media (min-width: 768px) {
-      nav {
-        display: flex;
-      }
-    }
-    .page-btn {
-      font-size: 0.875rem;
-      font-weight: 300;
-      color: #888;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      transition: color 0.2s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .page-btn.active {
-      color: #111;
-      font-weight: 400;
-    }
-    .page-btn:hover,
-    .page-btn:active {
-      color: #111;
-    }
-    #langBtn {
-      font-size: 0.875rem;
-      font-weight: 300;
-      color: #888;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      transition: color 0.2s ease;
-      -webkit-tap-highlight-color: transparent;
-    }
-    #langBtn:hover,
-    #langBtn:active {
-      color: #111;
-    }
+@keyframes float{
+  0%,100%{transform:translateY(0) scale(1)}
+  50%{transform:translateY(-35px) scale(1.06)}
+}
 
-    /* 苹果风格元素动画 - 彻底修复卡顿 */
-    .animate-element {
-      opacity: 0;
-      transform: translateY(30px);
-      transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), 
-                  transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-      will-change: opacity, transform;
-    }
-    .animate-element.active {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .animate-img {
-      opacity: 0;
-      transform: scale(0.98);
-      transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), 
-                  transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-      will-change: opacity, transform;
-    }
-    .animate-img.active {
-      opacity: 1;
-      transform: scale(1);
-    }
-    .animate-btn {
-      opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.2s, 
-                  transform 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.2s;
-      will-change: opacity, transform;
-    }
-    .animate-btn.active {
-      opacity: 1;
-      transform: translateY(0);
-    }
+.hero h1{font-size:54px;font-weight:700;margin-bottom:18px;position:relative;z-index:2}
+.hero p{font-size:21px;max-width:650px;position:relative;z-index:2}
 
-    /* 响应式调整 - 适配小屏 */
-    @media (max-width: 768px) {
-      .scroll-page {
-        padding: 0 1rem;
-        justify-content: flex-start;
-        padding-top: 80px;
-      }
-      .container-zeg {
-        padding: 0 1rem;
-      }
-      h1 {
-        font-size: 2.5rem !important;
-        line-height: 1.4 !important;
-      }
-      .social-sidebar {
-        right: 20px;
-        gap: 15px;
-      }
-      .social-item {
-        width: 40px;
-        height: 40px;
-      }
-      .social-item i {
-        font-size: 18px;
-      }
-      .social-tooltip {
-        right: calc(100% + 15px);
-        padding: 10px 18px;
-      }
-      .avatar-img {
-        width: 36px;
-        height: 36px;
-      }
-      .tooltip-name {
-        font-size: 14px;
-      }
-      .contact-info {
-        font-size: 0.9rem !important;
-        line-height: 1.6 !important;
-      }
-      .header-inner {
-        padding: 0 1rem;
-      }
-      .nav-wrapper {
-        gap: 1rem;
-      }
-    }
+/* ========== 内容 ========== */
+.section{max-width:1000px;margin:0 auto;padding:110px 24px}
+.section-title{font-size:34px;font-weight:700;text-align:center;margin-bottom:50px}
 
-    /* 移动端禁止高亮 */
-    * {
-      -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-      tap-highlight-color: rgba(0, 0, 0, 0);
-    }
-  </style>
+.business-list{display:grid;grid-template-columns:repeat(2,1fr);gap:30px}
+.business-item{
+  padding:34px;
+  background:#fafafa;
+  border-radius:20px;
+  transition:all 0.35s cubic-bezier(0.165,0.84,0.44,1);
+  border:1px solid transparent;
+}
+.business-item:hover{
+  transform:translateY(-10px) scale(1.02);
+  box-shadow:0 15px 30px rgba(0,0,0,0.07);
+  background:#fff;
+  border-color:#e0e0e0;
+}
+.business-item h3{font-size:18px;font-weight:600;margin-bottom:10px}
+.business-item p{font-size:15px;color:#444;line-height:1.5}
+
+.company{background:#f7f8fa;padding:90px 24px}
+.company-inner{max-width:700px;margin:0 auto}
+.info-item{
+  display:flex;padding:18px 0;border-bottom:1px solid #e1e1e2;transition:0.2s;
+}
+.info-item:hover{background:#f0f4ff}
+.info-label{width:130px;font-weight:600}
+
+.footer{padding:45px;text-align:center;color:#888;border-top:1px solid #eee}
+
+/* ========== 手机适配 ========== */
+@media(max-width:768px){
+  body{padding-top:66px;}
+  .hero h1{font-size:36px}
+  .business-list{grid-template-columns:1fr}
+}
+
+/* ========== 语言切换 100%完美 ========== */
+.ja { display: none !important; }
+.zh { display: none !important; }
+html[lang="ja"] .ja { display: block !important; }
+html[lang="zh"] .zh { display: block !important; }
+</style>
 </head>
 
 <body>
-  <!-- 固定导航 -->
-  <header id="header">
-    <div class="header-inner">
-      <a href="#" class="text-thin" id="logo">東京シシ説</a>
-      <div class="nav-wrapper">
-        <nav>
-          <button class="page-btn active" data-page="0">HOME</button>
-          <button class="page-btn" data-page="1">ABOUT</button>
-          <button class="page-btn" data-page="2">SERVICE</button>
-          <button class="page-btn" data-page="3">WORKS</button>
-          <button class="page-btn" data-page="4">CONTACT</button>
-        </nav>
-        <button id="langBtn" class="text-thin">中文</button>
-      </div>
-    </div>
-  </header>
 
-  <!-- 社交角标 -->
-  <div class="social-sidebar">
-    <div class="social-item">
-      <i class="fa-brands fa-tiktok"></i>
-      <div class="social-tooltip">
-        <img 
-          src="https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/b16bebed57684c5d8da0299e8951e99b.jpg~tplv-a9rns2rl98-24:720:720.image?lk3s=8e244e95&rcl=20260302181820324CBFB3089B879DA651&rrcfp=8a172a1a&x-expires=1773051500&x-signature=ezK2l0CmC57E7GP9bNcAmOL0Sxg%3D" 
-          alt="东京茜茜说" 
-          class="avatar-img"
-          onerror="this.src='https://picsum.photos/42/42?grayscale'"
-        >
-        <span class="tooltip-name">东京茜茜说</span>
-      </div>
-    </div>
-    <div class="social-item">
-      <i class="fa-brands fa-weixin"></i>
-      <div class="social-tooltip">
-        <img 
-          src="https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/b16bebed57684c5d8da0299e8951e99b.jpg~tplv-a9rns2rl98-24:720:720.image?lk3s=8e244e95&rcl=20260302181820324CBFB3089B879DA651&rrcfp=8a172a1a&x-expires=1773051500&x-signature=ezK2l0CmC57E7GP9bNcAmOL0Sxg%3D" 
-          alt="东京茜茜说" 
-          class="avatar-img"
-          onerror="this.src='https://picsum.photos/42/42?grayscale'"
-        >
-        <span class="tooltip-name">东京茜茜说</span>
-      </div>
-    </div>
-    <div class="social-item">
-      <i class="fa-solid fa-video"></i>
-      <div class="social-tooltip">
-        <img 
-          src="https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/b16bebed57684c5d8da0299e8951e99b.jpg~tplv-a9rns2rl98-24:720:720.image?lk3s=8e244e95&rcl=20260302181820324CBFB3089B879DA651&rrcfp=8a172a1a&x-expires=1773051500&x-signature=ezK2l0CmC57E7GP9bNcAmOL0Sxg%3D" 
-          alt="东京茜茜说" 
-          class="avatar-img"
-          onerror="this.src='https://picsum.photos/42/42?grayscale'"
-        >
-        <span class="tooltip-name">东京茜茜说</span>
-      </div>
+<!-- 只保留一个主导航，固定在最顶部 -->
+<div class="nav">
+  <div class="nav-inner">
+    <div class="logo">株式会社茜</div>
+    <div>
+      <button class="lang active" onclick="setLang('ja')">日本語</button>
+      <button class="lang" onclick="setLang('zh')">中文</button>
     </div>
   </div>
+</div>
 
-  <!-- 核心滚动容器 -->
-  <div class="scroll-container" id="scrollContainer">
-    <div class="pages-wrapper" id="pagesWrapper">
-      <!-- 第1页：HOME -->
-      <div class="scroll-page" data-page="0">
-        <div class="container-zeg">
-          <div class="w-full h-[45vh] mb-20 overflow-hidden animate-img">
-            <img src="https://picsum.photos/id/1076/1200/600" alt="東京高級マンション" onerror="this.src='https://picsum.photos/1200/600?grayscale'">
-          </div>
-          <p class="text-[#888888] text-xl text-thin mb-8 animate-element" id="catch1">不動産に変わらない価値を</p>
-          <h1 class="text-4xl md:text-5xl text-thin mb-16 leading-tight animate-element" id="catch2">
-            日本の大家さんになりたいなら<br>東京シシ説をフォロー
-          </h1>
-          <a href="#" class="inline-block px-8 py-3 border border-black text-thin hover:bg-black hover:text-white transition-zeg animate-btn" id="btn">無料相談</a>
-        </div>
-      </div>
+<!-- 首页 -->
+<section class="hero">
+  <div class="dot1"></div>
+  <div class="dot2"></div>
+  <div>
+    <h1 class="ja">メディアを核とする</h1>
+    <h1 class="zh">以媒体为核心</h1>
+    <p class="ja">株式会社茜は、広告・コンテンツ制作を中心とする自社メディア運営企業です。</p>
+    <p class="zh">株式会社茜是一家以广告、内容制作为核心的自媒体运营公司。</p>
+  </div>
+</section>
 
-      <!-- 第2页：ABOUT -->
-      <div class="scroll-page" data-page="1">
-        <div class="container-zeg">
-          <div class="flex flex-col md:flex-row gap-16">
-            <div class="md:w-1/4">
-              <p class="text-[#888888] text-thin mb-2 animate-element">01</p>
-              <h2 class="text-2xl text-thin animate-element" id="about_title">ABOUT US</h2>
-            </div>
-            <div class="md:w-3/4">
-              <p class="text-[#888888] text-lg text-thin leading-relaxed mb-8 animate-element" id="about_text" style="transition-delay: 0.1s;">
-                東京シシ説は、東京を中心とする不動産投資・賃貸・経営サポートを行う専門家集団です。8年の実績と1万人を超えるお客様から信頼をいただいています。
-              </p>
-              <p class="text-[#888888] text-lg text-thin leading-relaxed animate-element" id="about_text2" style="transition-delay: 0.2s;">
-                私たちは「不動産で豊かな未来をつくる」を理念に、初心者でも安心して大家さんになれるよう徹底的にサポートします。
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 第3页：SERVICE -->
-      <div class="scroll-page bg-[#EEEEEE]/20" data-page="2">
-        <div class="container-zeg">
-          <div class="flex flex-col md:flex-row gap-16">
-            <div class="md:w-1/4">
-              <p class="text-[#888888] text-thin mb-2 animate-element">02</p>
-              <h2 class="text-2xl text-thin animate-element" id="service_title">SERVICE</h2>
-            </div>
-            <div class="md:w-3/4 grid md:grid-cols-3 gap-8">
-              <div class="animate-element" style="transition-delay: 0.1s;">
-                <h3 class="text-xl text-thin mb-4" id="s1">不動産投資相談</h3>
-                <p class="text-[#888888] text-thin leading-relaxed" id="s1t">資産状況に合わせた最適なプランをご提案</p>
-              </div>
-              <div class="animate-element" style="transition-delay: 0.2s;">
-                <h3 class="text-xl text-thin mb-4" id="s2">物件紹介</h3>
-                <p class="text-[#888888] text-thin leading-relaxed" id="s2t">東京の好立地物件を豊富にご用意</p>
-              </div>
-              <div class="animate-element" style="transition-delay: 0.3s;">
-                <h3 class="text-xl text-thin mb-4" id="s3">賃貸管理</h3>
-                <p class="text-[#888888] text-thin leading-relaxed" id="s3t">購入後の運用・管理まで一括サポート</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 第4页：WORKS -->
-      <div class="scroll-page" data-page="3">
-        <div class="container-zeg">
-          <div class="flex flex-col md:flex-row gap-16">
-            <div class="md:w-1/4">
-              <p class="text-[#888888] text-thin mb-2 animate-element">03</p>
-              <h2 class="text-2xl text-thin animate-element" id="works_title">WORKS</h2>
-            </div>
-            <div class="md:w-3/4 grid grid-cols-2 gap-4">
-              <img src="https://picsum.photos/id/1076/600/400" alt="物件事例" class="w-full animate-img" style="transition-delay: 0.1s;" onerror="this.src='https://picsum.photos/600/400?grayscale'">
-              <img src="https://picsum.photos/id/1048/600/400" alt="物件事例" class="w-full animate-img" style="transition-delay: 0.2s;" onerror="this.src='https://picsum.photos/600/400?grayscale'">
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 第5页：CONTACT -->
-      <div class="scroll-page bg-[#EEEEEE]/20" data-page="4">
-        <div class="container-zeg">
-          <div class="flex flex-col md:flex-row gap-16">
-            <div class="md:w-1/4">
-              <p class="text-[#888888] text-thin mb-2 animate-element">04</p>
-              <h2 class="text-2xl text-thin animate-element" id="contact_title">CONTACT</h2>
-            </div>
-            <div class="md:w-3/4">
-              <p class="text-[#888888] text-lg text-thin leading-relaxed mb-6 animate-element" id="contact_text" style="transition-delay: 0.1s;">
-                不動産投資のことなら何でもご相談ください。オンライン無料相談を受け付けています。
-              </p>
-              <div class="text-[#888888] text-lg text-thin leading-relaxed mb-12">
-                <p class="animate-element contact-info" id="company_address" style="transition-delay: 0.2s; margin-bottom: 8px;">
-                  住所：101-0054 東京都千代田区神田錦町3-7-2 東京堂錦町ビル8階
-                </p>
-                <p class="animate-element contact-info" id="company_tel" style="transition-delay: 0.3s; margin-bottom: 8px;">
-                  TEL：050-6883-6795
-                </p>
-                <p class="animate-element contact-info" id="company_fax" style="transition-delay: 0.4s;">
-                  FAX：050-6883-6690
-                </p>
-              </div>
-              <a href="mailto:your-email@example.com" class="inline-block px-8 py-3 border border-black text-thin hover:bg-black hover:text-white transition-zeg animate-btn" id="btn2" style="transition-delay: 0.5s;">無料個別相談</a>
-            </div>
-          </div>
-        </div>
-      </div>
+<!-- 业务内容 -->
+<section id="business" class="section">
+  <h2 class="section-title ja">事業内容</h2>
+  <h2 class="section-title zh">业务内容</h2>
+  <div class="business-list">
+    <div class="business-item">
+      <h3 class="ja">1. 広告・宣伝の企画、制作、代理業</h3>
+      <h3 class="zh">1. 广告、宣传企划、制作、代理</h3>
+      <p class="ja">媒体コア業務：ブランドPR、広告デザイン、メディア配信</p>
+      <p class="zh">媒体核心业务：品牌推广、广告设计、媒体投放、营销代理</p>
+    </div>
+    <div class="business-item">
+      <h3 class="ja">2. インターネットコンテンツの企画、制作、販売</h3>
+      <h3 class="zh">2. 互联网内容企划、制作、销售</h3>
+      <p class="ja">新メディア、動画、Webサイト制作運営</p>
+      <p class="zh">新媒体内容、视频、网站、数字化媒体制作运营</p>
+    </div>
+    <div class="business-item">
+      <h3 class="ja">3. 観光情報の提供及びツアー企画運営</h3>
+      <h3 class="zh">3. 旅游信息提供与旅游企划运营</h3>
+    </div>
+    <div class="business-item">
+      <h3 class="ja">4. 留学の企画、斡旋、手続代行</h3>
+      <h3 class="zh">4. 留学规划、介绍、手续代办</h3>
+    </div>
+    <div class="business-item">
+      <h3 class="ja">5. 専門学校、日本語教育機関の経営</h3>
+      <h3 class="zh">5. 专门学校、日语教育机构运营</h3>
+    </div>
+    <div class="business-item">
+      <h3 class="ja">6. 投資情報の分析、収集、提供</h3>
+      <h3 class="zh">6. 投资信息分析、收集、提供</h3>
+    </div>
+    <div class="business-item">
+      <h3 class="ja">7. 不動産仲介、斡旋、コンサルティング</h3>
+      <h3 class="zh">7. 房地产中介、介绍、咨询</h3>
+    </div>
+    <div class="business-item">
+      <h3 class="ja">8. 建築工事、設備工事の設計、施工</h3>
+      <h3 class="zh">8. 建筑、设备工程设计、施工</h3>
+    </div>
+    <div class="business-item">
+      <h3 class="ja">9. 住宅・店舗の増改築、リフォーム企画</h3>
+      <h3 class="zh">9. 住宅、店铺增建、装修企划</h3>
+    </div>
+    <div class="business-item">
+      <h3 class="ja">10. その他、関連業務全般</h3>
+      <h3 class="zh">10. 其他相关业务</h3>
     </div>
   </div>
+</section>
 
-  <script>
-    // 等待DOM完全加载后执行
-    document.addEventListener('DOMContentLoaded', () => {
-      // ========== 修复1：动态计算视口高度（解决移动端100vh兼容问题） ==========
-      function setViewportHeight() {
-        const vh = window.innerHeight * 0.01;
-        document.documentElement.style.setProperty('--vh', `${vh}px`);
-        
-        // 更新滚动容器和页面高度
-        const scrollContainer = document.getElementById('scrollContainer');
-        const scrollPages = document.querySelectorAll('.scroll-page');
-        scrollContainer.style.height = `${window.innerHeight}px`;
-        scrollPages.forEach(page => {
-          page.style.height = `${window.innerHeight}px`;
-        });
-      }
-      
-      // 初始化+监听窗口大小变化
-      setViewportHeight();
-      window.addEventListener('resize', setViewportHeight);
+<!-- 公司信息 -->
+<section id="company" class="company section">
+  <h2 class="section-title ja">会社情報</h2>
+  <h2 class="section-title zh">公司信息</h2>
+  <div class="company-inner">
+    <div class="info-item">
+      <div class="info-label ja">会社名</div><div class="info-label zh">公司名</div>
+      <div>株式会社茜</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label ja">住所</div><div class="info-label zh">地址</div>
+      <div>101-0054 東京都千代田区神田錦町3-7-2 東京堂錦町ビル8階</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">TEL</div><div>050-6883-6795</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">FAX</div><div>050-6883-6690</div>
+    </div>
+  </div>
+</section>
 
-      // ========== 双语数据 ==========
-      const lang = {
-        ja: {
-          logo: "東京シシ説",
-          catch1: "不動産に変わらない価値を",
-          catch2: "日本の大家さんになりたいなら\n東京シシ説をフォロー",
-          btn: "無料相談",
-          about_title: "ABOUT US",
-          about_text: "東京シシ説は、東京を中心とする不動産投資・賃貸・経営サポートを行う専門家集団です。8年の実績と1万人を超えるお客様から信頼をいただいています。",
-          about_text2: "私たちは「不動産で豊かな未来をつくる」を理念に、初心者でも安心して大家さんになれるよう徹底的にサポートします。",
-          service_title: "SERVICE",
-          s1: "不動産投資相談", s1t: "資産状況に合わせた最適なプランをご提案",
-          s2: "物件紹介", s2t: "東京の好立地物件を豊富にご用意",
-          s3: "賃貸管理", s3t: "購入後の運用・管理まで一括サポート",
-          works_title: "WORKS",
-          contact_title: "CONTACT",
-          contact_text: "不動産投資のことなら何でもご相談ください。オンライン無料相談を受け付けています。",
-          company_address: "住所：101-0054 東京都千代田区神田錦町3-7-2 東京堂錦町ビル8階",
-          company_tel: "TEL：050-6883-6795",
-          company_fax: "FAX：050-6883-6690",
-          btn2: "無料個別相談",
-          tooltipName: "東京シシ説"
-        },
-        zh: {
-          logo: "东京茜茜说",
-          catch1: "房产的永恒价值",
-          catch2: "想当日本包租婆\n关注东京茜茜说",
-          btn: "免费咨询",
-          about_title: "关于我们",
-          about_text: "东京茜茜说是以东京为中心，提供房产投资、租赁、运营支持的专业团队。拥有8年经验，获得超1万客户的信赖。",
-          about_text2: "我们以“用房产创造富足未来”为理念，全力支持新手安心成为房东。",
-          service_title: "服务内容",
-          s1: "房产投资咨询", s1t: "根据资产情况提供最优方案",
-          s2: "房源介绍", s2t: "提供大量东京好地段房源",
-          s3: "租赁管理", s3t: "从购买到运营管理一站式支持",
-          works_title: "案例展示",
-          contact_title: "联系我们",
-          contact_text: "任何房产投资问题都可咨询，我们提供线上免费一对一咨询。",
-          company_address: "地址：101-0054 东京都千代田区神田锦町3-7-2 东京堂锦町大楼8楼",
-          company_tel: "电话：050-6883-6795",
-          company_fax: "传真：050-6883-6690",
-          btn2: "免费一对一咨询",
-          tooltipName: "东京茜茜说"
-        }
-      };
+<!-- 底部 -->
+<div class="footer">
+  <p class="ja">© 2025 株式会社茜 All Rights Reserved.</p>
+  <p class="zh">© 2025 株式会社茜 版权所有</p>
+</div>
 
-      // ========== 语言切换逻辑 ==========
-      let currentLang = 'ja';
-      const langBtn = document.getElementById('langBtn');
-      const tooltipNames = document.querySelectorAll('.tooltip-name');
-      const logoEl = document.getElementById('logo');
-
-      langBtn.addEventListener('click', () => {
-        currentLang = currentLang === 'ja' ? 'zh' : 'ja';
-        langBtn.textContent = currentLang === 'ja' ? '中文' : '日本語';
-        
-        // 更新页面所有文本
-        for (const key in lang[currentLang]) {
-          const el = document.getElementById(key);
-          if (el) {
-            el.innerHTML = lang[currentLang][key].replace(/\n/g, '<br>');
-          }
-        }
-
-        // 更新logo和提示文字
-        logoEl.textContent = lang[currentLang].logo;
-        tooltipNames.forEach(el => {
-          el.textContent = lang[currentLang].tooltipName;
-        });
-      });
-
-      // ========== 滚动动画核心逻辑 ==========
-      const pagesWrapper = document.getElementById('pagesWrapper');
-      const pages = document.querySelectorAll('.scroll-page');
-      const pageBtns = document.querySelectorAll('.page-btn');
-      const scrollContainer = document.getElementById('scrollContainer');
-      let currentPage = 0;
-      const totalPages = pages.length;
-      let isAnimating = false;
-
-      // 移动端触摸变量
-      let touchStartY = 0;
-      let touchEndY = 0;
-      const SWIPE_THRESHOLD = 50;
-
-      // ========== 修复2：稳定的动画触发逻辑 ==========
-      function activatePageAnimations(pageIndex) {
-        const currentPageEl = pages[pageIndex];
-        const animateElements = currentPageEl.querySelectorAll('.animate-element, .animate-img, .animate-btn');
-        
-        // 重置动画状态（强制重绘）
-        animateElements.forEach(el => {
-          el.classList.remove('active');
-          el.style.opacity = '0';
-          if (el.classList.contains('animate-element')) el.style.transform = 'translateY(30px)';
-          if (el.classList.contains('animate-img')) el.style.transform = 'scale(0.98)';
-          if (el.classList.contains('animate-btn')) el.style.transform = 'translateY(20px)';
-          void el.offsetWidth; // 强制重绘
-        });
-        
-        // 分批次触发动画（更流畅）
-        setTimeout(() => {
-          animateElements.forEach((el, idx) => {
-            setTimeout(() => {
-              el.classList.add('active');
-              el.style.opacity = '';
-              el.style.transform = '';
-            }, (el.style.transitionDelay || 0) || idx * 50);
-          });
-        }, 100); 
-      }
-
-      // 更新导航按钮状态
-      function updateNavButtons() {
-        pageBtns.forEach((btn, idx) => {
-          btn.classList.toggle('active', idx === currentPage);
-        });
-      }
-
-      // 切换页面核心函数
-      function goToPage(pageIndex) {
-        if (pageIndex < 0 || pageIndex >= totalPages || isAnimating) return;
-        
-        isAnimating = true;
-        currentPage = pageIndex;
-        
-        // 仅修改transform（GPU加速）
-        pagesWrapper.style.transform = `translateY(-${currentPage * 100}%)`;
-        
-        // 更新导航和激活动画
-        updateNavButtons();
-        activatePageAnimations(currentPage);
-        
-        // 匹配CSS过渡时长解锁
-        setTimeout(() => {
-          isAnimating = false;
-        }, 800); 
-      }
-
-      // ========== 修复3：滚动事件优化（无浏览器警告） ==========
-      let wheelTimeout;
-      document.addEventListener('wheel', (e) => {
-        if (isAnimating) return;
-        e.preventDefault(); // 阻止默认滚动
-        
-        clearTimeout(wheelTimeout);
-        wheelTimeout = setTimeout(() => {
-          goToPage(e.deltaY > 0 ? currentPage + 1 : currentPage - 1);
-        }, 50);
-      }, { passive: false });
-
-      // 移动端触摸事件
-      scrollContainer.addEventListener('touchstart', (e) => {
-        if (isAnimating) return;
-        touchStartY = e.touches[0].clientY;
-      }, { passive: true });
-
-      scrollContainer.addEventListener('touchmove', (e) => {
-        if (isAnimating) return;
-        touchEndY = e.touches[0].clientY;
-      }, { passive: true });
-
-      scrollContainer.addEventListener('touchend', () => {
-        if (isAnimating) return;
-        
-        const swipeDistance = touchEndY - touchStartY;
-        if (swipeDistance < -SWIPE_THRESHOLD) {
-          goToPage(currentPage + 1);
-        } else if (swipeDistance > SWIPE_THRESHOLD) {
-          goToPage(currentPage - 1);
-        }
-        
-        touchStartY = 0;
-        touchEndY = 0;
-      }, { passive: true });
-
-      // 导航按钮点击
-      pageBtns.forEach((btn, idx) => {
-        btn.addEventListener('click', () => goToPage(idx));
-      });
-
-      // 键盘上下键控制
-      document.addEventListener('keydown', (e) => {
-        if (isAnimating) return;
-        if (e.key === 'ArrowUp') goToPage(currentPage - 1);
-        else if (e.key === 'ArrowDown') goToPage(currentPage + 1);
-      });
-
-      // 初始化
-      activatePageAnimations(0);
-      updateNavButtons();
-    });
-  </script>
+<script>
+function setLang(lang){
+  document.documentElement.setAttribute('lang', lang);
+  document.querySelectorAll('.lang').forEach(e=>e.classList.remove('active'));
+  event.target.classList.add('active');
+}
+</script>
 </body>
 </html>
